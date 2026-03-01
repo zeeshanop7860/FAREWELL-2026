@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Final Glimmer Party</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #050507;
+      --deep: #0d0c14;
+      --surface: #12111c;
+      --surface2: #1a1928;
+      --gold: #e8c97a;
+      --gold2: #f5e0a0;
+      --rose: #d4607a;
+      --violet: #7b5ea7;
+      --text: #e8e4f0;
+      --muted: #8a85a0;
+      --border: rgba(232, 201, 122, 0.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: .5;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.4rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to bottom, rgba(5,5,7,.9) 0%, transparent 100%);
+      backdrop-filter: blur(8px);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transition: color .25s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      transition: all .3s;
+    }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 7rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, rgba(123,94,167,.22) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(212,96,122,.15) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 10% 70%, rgba(232,201,122,.08) 0%, transparent 60%);
+    }
+    .sparks { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .spark {
+      position: absolute;
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: sparkle var(--dur, 4s) var(--delay, 0s) infinite ease-in-out;
+      opacity: 0;
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(1); }
+      50% { opacity: .9; transform: scale(1.8); }
+    }
+    .hero-eyebrow {
+      font-size: .78rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+      animation: fadeUp .8s .2s both;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.2rem, 10vw, 8rem);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -.01em;
+      animation: fadeUp .9s .35s both;
+    }
+    .hero-title em { font-style: italic; color: var(--gold); display: block; }
+    .hero-tagline {
+      margin-top: 1.8rem;
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 540px;
+      animation: fadeUp .9s .5s both;
+    }
+    .hero-cta {
+      margin-top: 3rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp .9s .65s both;
+    }
+    .btn-ghost {
+      padding: .85rem 2.4rem;
+      background: transparent;
+      color: var(--gold);
+      font-weight: 500;
+      font-size: .9rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color .25s, color .25s;
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold2); }
+    .btn-primary {
+      padding: .85rem 2.4rem;
+      background: var(--gold);
+      color: var(--black);
+      font-weight: 700;
+      font-size: .9rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+      transition: background .25s, transform .2s;
+    }
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); }
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      animation: fadeIn 1.2s 1.2s both;
+    }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollLine 1.8s 1.4s infinite;
+    }
+    @keyframes scrollLine {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* SECTION BASICS */
+    section { padding: 6rem 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: .72rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .8rem;
+      font-weight: 500;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    .divider {
+      width: 60px; height: 2px;
+      background: linear-gradient(to right, var(--gold), var(--rose));
+      margin-bottom: 2.5rem;
+    }
+
+    /* ABOUT */
+    #about { background: var(--deep); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .about-text p {
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+    .about-visual { position: relative; display: flex; justify-content: center; }
+    .glow-card {
+      width: 300px; height: 380px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .glow-card::before {
+      content: '';
+      position: absolute;
+      inset: -60px;
+      background: radial-gradient(circle at 50% 50%, rgba(232,201,122,.12), transparent 70%);
+      animation: cardPulse 4s ease-in-out infinite;
+    }
+    @keyframes cardPulse {
+      0%,100% { opacity: .6; }
+      50% { opacity: 1; }
+    }
+    .glow-card-icon { font-size: 3.5rem; position: relative; z-index: 1; }
+    .glow-card-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--gold);
+      text-align: center;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* VENUE */
+    #venue { background: var(--deep); }
+    .venue-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .venue-visual { position: relative; }
+    .venue-map-placeholder {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--muted);
+      font-size: .9rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .venue-map-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(232,201,122,.04) 39px, rgba(232,201,122,.04) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(232,201,122,.04) 39px, rgba(232,201,122,.04) 40px);
+    }
+    .venue-pin {
+      font-size: 3rem;
+      position: relative;
+      z-index: 1;
+      animation: pinBounce 2s ease-in-out infinite;
+    }
+    @keyframes pinBounce {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .venue-details { display: flex; flex-direction: column; gap: 2rem; }
+    .venue-detail-item h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      margin-bottom: .4rem;
+    }
+    .venue-detail-item p { color: var(--muted); font-size: .95rem; line-height: 1.7; }
+
+    /* CONTACT */
+    #contact { background: var(--black); }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .contact-info p { color: var(--muted); font-size: 1rem; line-height: 1.8; margin-bottom: 2rem; }
+    .contact-social { display: flex; flex-direction: column; gap: .8rem; }
+    .contact-social-item {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .9rem;
+      transition: color .25s;
+    }
+    .contact-social-item:hover { color: var(--gold); }
+    .contact-social-icon {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: border-color .25s;
+    }
+    .contact-social-item:hover .contact-social-icon { border-color: var(--gold); }
+    .contact-form { display: flex; flex-direction: column; gap: 1.2rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    .form-group { display: flex; flex-direction: column; gap: .5rem; }
+    .form-group label {
+      font-size: .75rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .form-group input,
+    .form-group textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .85rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .25s;
+      width: 100%;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--gold); }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+    .form-submit { margin-top: .5rem; }
+
+    /* FOOTER */
+    footer {
+      background: var(--deep);
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--gold);
+      margin-bottom: .6rem;
+    }
+    footer p { color: var(--muted); font-size: .82rem; margin-bottom: .25rem; }
+    .footer-credit {
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer-credit p { color: var(--muted); font-size: .82rem; margin-bottom: .3rem; }
+    .footer-credit span { color: var(--gold); font-weight: 500; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .about-grid,
+      .venue-grid,
+      .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .about-visual { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(5,5,7,.97);
+        justify-content: center;
+        align-items: center;
+        gap: 2.5rem;
+        z-index: 99;
+      }
+      .nav-links.open a { font-size: 1.2rem; }
+      .hamburger { display: flex; z-index: 200; }
+      section { padding: 4rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV — removed Pricing link -->
+  <nav>
+    <a href="#hero" class="nav-logo">✦ TFG Party</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#about">About</a></li>
+      <li><a href="#venue">Venue</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- PAGE 1 — HERO: removed "Reserve Your Spot" button -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="sparks" id="sparks"></div>
+
+    <p class="hero-eyebrow">✦ One Night Only ✦</p>
+    <h1 class="hero-title">
+      The Final<br/>
+      <em>Glimmer</em><br/>
+      Party
+    </h1>
+    <p class="hero-tagline">Where the night burns brightest before it fades into legend.</p>
+    <div class="hero-cta">
+      <a href="#about" class="btn-ghost">Learn More</a>
+    </div>
+
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- PAGE 2 — ABOUT: removed tags box (Live Music, Open Bar, etc.) -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <p class="section-label">About the Event</p>
+          <h2 class="section-title">One Last Night to<br/>Remember</h2>
+          <div class="divider"></div>
+          <p>The Final Glimmer Party is not just an event — it's an experience carved out of light, music, and the bittersweet beauty of a perfect ending. We believe every great era deserves a grand finale.</p>
+          <p>From dusk to dawn, expect a curated journey: immersive light installations, live performances, a world-class DJ set, signature cocktails, and moments that linger long after the last note fades.</p>
+          <p>This is your night to shine.</p>
+        </div>
+        <div class="about-visual reveal">
+          <div class="glow-card">
+            <div class="glow-card-icon">✨</div>
+            <p class="glow-card-text">"Make it memorable. Make it golden. Make it the last great night."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 3 — VENUE: updated name, address, date/time; removed capacity & badges -->
+  <section id="venue">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">The Venue</p>
+        <h2 class="section-title">Where the Glimmer Lives</h2>
+        <div class="divider"></div>
+      </div>
+      <div class="venue-grid">
+        <div class="venue-visual reveal">
+          <div class="venue-map-placeholder">
+            <div class="venue-pin">📍</div>
+            <p style="position:relative;z-index:1;font-family:'Playfair Display',serif;font-style:italic;font-size:1.1rem;color:var(--gold);text-align:center;padding:0 1rem;">Tamara Banquet &amp; Restaurant</p>
+          </div>
+        </div>
+        <div class="venue-details reveal">
+          <div class="venue-detail-item">
+            <h4>📍 Address</h4>
+            <p>Asaram Ashram Bridge Road, Gangapur Rd,<br/>near Westwind Meadows,<br/>Nashik, Maharashtra 422003</p>
+          </div>
+          <div class="venue-detail-item">
+            <h4>📅 Date &amp; Time</h4>
+            <p>Wednesday, 25th March<br/>Doors open at 5:00 PM</p>
+          </div>
+          <div class="venue-detail-item">
+            <h4>🚗 Getting There</h4>
+            <p>Parking available on-site · Rideshare drop-off at main entrance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 4 — CONTACT: phone numbers only, no form -->
+  <section id="contact">
+    <div class="container">
+      <div style="max-width:560px;margin:0 auto;text-align:center;">
+        <div class="reveal">
+          <p class="section-label">Get in Touch</p>
+          <h2 class="section-title">Get in Touch</h2>
+          <div class="divider" style="margin:0 auto 2.5rem;"></div>
+          <p style="color:var(--muted);font-size:1rem;line-height:1.8;margin-bottom:2rem;">Reach out to us for any enquiries about the event. We'll get back to you as soon as possible.</p>
+          <div class="contact-social" style="align-items:center;">
+            <a href="tel:+917588194823" class="contact-social-item" style="justify-content:center;">
+              <div class="contact-social-icon">☎</div>
+              +91 75881 94823
+            </a>
+            <a href="tel:+917391860092" class="contact-social-item" style="justify-content:center;">
+              <div class="contact-social-icon">☎</div>
+              +91 73918 60092
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER: added Organised by & Website created by; removed Dress code -->
+  <footer>
+    <div class="footer-logo">✦ The Final Glimmer Party ✦</div>
+    <p>© 2025 The Final Glimmer Party. All rights reserved.</p>
+    <div class="footer-credit">
+      <p>Organised by :— <span>Zeeshan Patel &amp; Sabir Shaikh</span></p>
+      <p>Website created by :— <span>Zeeshan Patel</span></p>
+    </div>
+  </footer>
+
+  <script>
+    // Sparkles
+    const sparksEl = document.getElementById('sparks');
+    for (let i = 0; i < 60; i++) {
+      const s = document.createElement('div');
+      s.className = 'spark';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.setProperty('--dur', (3 + Math.random() * 5) + 's');
+      s.style.setProperty('--delay', (Math.random() * 5) + 's');
+      const colors = ['#e8c97a','#f5e0a0','#d4607a','#a78bfa','#ffffff'];
+      s.style.background = colors[Math.floor(Math.random() * colors.length)];
+      s.style.width = s.style.height = (1 + Math.random() * 3) + 'px';
+      sparksEl.appendChild(s);
+    }
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.12 });
+    reveals.forEach(r => observer.observe(r));
+
+    // Mobile nav
+    const ham = document.getElementById('hamburger');
+    const navEl = document.getElementById('navLinks');
+    ham.addEventListener('click', () => { navEl.classList.toggle('open'); });
+    navEl.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navEl.classList.remove('open')));
+
+    // Form submit
+    function handleSubmit(e) {
+      e.preventDefault();
+      document.getElementById('formSuccess').style.display = 'block';
+      e.target.reset();
+      setTimeout(() => { document.getElementById('formSuccess').style.display = 'none'; }, 5000);
+    }
+  </script>
+</body>
+</html>
